@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="./plugins/all.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="./plugins/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="./plugins/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="./plugins/buttons.bootstrap4.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- Theme style -->
+    <link rel="stylesheet" href="./plugins/adminlte.min.css">
+</head>
+<body>
+
+    <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;margin-top: 10%;">
+            <div>
+                <h1>JsonPowerDB Data<p>Dashboard</p></h1>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label for="inputsm">welcome user</label>
+                    <input class="form-control input-sm" id="inputsm" type="text" placeholder="Enter your token">
+                </div>
+            </form>
+            <div>
+                <button class="btn btn-primary" id="myButton" >Enter</button>
+            </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById("myButton").onclick = function () {
+            var token= document.getElementById("inputsm").value;
+           var l= JSON.stringify(token);
+            localStorage.setItem("token_no",l);
+            location.href = "./dashboard.html";
+        };
+    </script>
+    <script type="text/javascript" src="./index.js" > </script>
+   
+ <script type="text/javascript"  src="https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+
+
+</body>
+</html>
