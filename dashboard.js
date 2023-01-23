@@ -112,10 +112,10 @@ function fun(r,d){
         .join("");
     }
     function showTableHead(arr){
-        return arr
+        return Object.keys(arr)
         .map(element =>(
             `
-            <th id="${element.colName}">${element.colName}</th>
+            <th id="${element}">${element}</th>
 
             `
         ))
@@ -131,7 +131,7 @@ function getDBname(){
         jQuery.ajaxSetup({async:true})
         var arr=result.data; 
         // // console.log(arr);
-        // jQuery.ajaxSetup({async:false})
+        jQuery.ajaxSetup({async:false})
         // console.log(arr,"arr")  
         arr.forEach(element => {
         // console.log(element);
@@ -156,17 +156,21 @@ function getDbRelName(dbObj){
 function getTablehead(dbName,dbRel){
     // console.log({dbName,dbRel})
     
-    var headreq=createGETALLCOLReques(conntoken,dbName,dbRel);
+    var headreq=createGET_ALL_Data(conntoken,dbName,dbRel);
     // console.log(headreq)
     jQuery.ajaxSetup({async:false})
     var result=executeCommand(headreq,irlpart);
     // console.log(result)
     jQuery.ajaxSetup({async:true})
-    result.data.push({colName: 'edit', colType: 'String'})
-    result.data.push({colName: 'remove', colType: 'String'})
-    result.data.unshift({colName: 'rec_no', colType: 'String'})
-    // // console.log(result.data)
-    document.getElementById("table-head").innerHTML=showTableHead(result.data)
+    obj=JSON.parse(result.data)['json_records']
+
+    obj[0]['record'] = {...obj[0]['record'], edit: 0}
+    obj[0]['record'] = {...obj[0]['record'], remove: 0}
+    obj[0]['record'] = {rec_no:0,...obj[0]['record']}
+    // console.log(obj[0]['record'])
+  
+    // obj[0]['record'].push({remove:""})
+    document.getElementById("table-head").innerHTML= showTableHead(obj[0]['record'])
     getAllData(dbName,dbRel)
 }
 let obj;
@@ -192,11 +196,11 @@ function getAllData(db,rel){
       obj=JSON.parse(result.data)['json_records']
 // console.log(JSON.parse(result.data)['rec_no'])
 // let obj1=JSON.parse(result.data)['rec_no'];
-// console.log(obj);
+// console.log(Object.keys(obj));
         document.getElementById("table-body").innerHTML = ""
         for (let index = 0; index < obj.length; index++) {
             // console.log(JSON.parse(result.data)['json_records'][index]['rec_no'])
-            console.log(obj[index]['record'])
+            // console.log(obj[index]['record'])
             
             document.getElementById("table-body").innerHTML += 
             `
