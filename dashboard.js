@@ -115,7 +115,7 @@ function fun(r,d){
         return arr
         .map(element =>(
             `
-            <th>${element.colName}</th>
+            <th id="${element.colName}">${element.colName}</th>
 
             `
         ))
@@ -154,7 +154,7 @@ function getDbRelName(dbObj){
 
 
 function getTablehead(dbName,dbRel){
-    console.log({dbName,dbRel})
+    // console.log({dbName,dbRel})
     
     var headreq=createGETALLCOLReques(conntoken,dbName,dbRel);
     // console.log(headreq)
@@ -169,30 +169,51 @@ function getTablehead(dbName,dbRel){
     document.getElementById("table-head").innerHTML=showTableHead(result.data)
     getAllData(dbName,dbRel)
 }
+let obj;
 function getTableBody(obj){
-        return obj
+        // console.log(Object.keys(obj));
+        return Object.keys(obj)
         .map(element=>(
            `
-           <td>${element}</td>
+            <td>${obj[element]}</td>
            `
         ))
         .join("")
 }
 
 function getAllData(db,rel){
-        var req=createGET_ALL_Data(conntoken,"Emp-DB","Emp-Data");
-        console.log(req);
+        var req=createGET_ALL_Data(conntoken,db,rel);
+        // console.log(req);
         jQuery.ajaxSetup({async:false})
         var result=executeCommand(req,irlpart);
         jQuery.ajaxSetup({async:true})
+        // console.log(result)
+
       obj=JSON.parse(result.data)['json_records']
-// console.log(JSON.parse(result.data)['json_records'])
-// console.log(obj[0]['record'])
+// console.log(JSON.parse(result.data)['rec_no'])
+// let obj1=JSON.parse(result.data)['rec_no'];
+// console.log(obj);
+        document.getElementById("table-body").innerHTML = ""
         for (let index = 0; index < obj.length; index++) {
-            // document.getElementById("table-body").innerHTML=getTableBody(obj[index]['record']);
+            // console.log(JSON.parse(result.data)['json_records'][index]['rec_no'])
             console.log(obj[index]['record'])
             
+            document.getElementById("table-body").innerHTML += 
+            `
+
+                 <tr>
+                 <td>${obj[index]['rec_no']}</td>
+                ${getTableBody(obj[index]['record'])}
+                <td><i class="fa-solid fa-pen-to-square"></i></td>
+            <td><i class="fa-solid fa-trash"></i></td> 
+                </tr>
+            `
+            // console.log(obj[index]['record']['da'])
+            // <td><i class="fa-solid fa-pen-to-square"></i></td>
+            // <td><i class="fa-solid fa-trash"></i></td> 
+            
         }
+
 
 }
 
@@ -203,4 +224,4 @@ getURL();
 getDBname();
 // getDbRelName();
 // getTablehead();
-getAllData();
+// getAllData();
