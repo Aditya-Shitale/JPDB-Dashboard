@@ -1,11 +1,14 @@
 
-var conntoken="";
+let conntoken;
 var jpdbBaseURL="http://api.login2explore.com:5577"
 var irlpart="/api/irl"
 var imlpart="/api/iml"
-function getURL(){
-    document.getElementById("showtoken").value = localStorage.getItem("token_no")
-    conntoken=localStorage.getItem("token_no")
+const getURL = async () => {
+    
+    conntoken = localStorage.getItem("token_no")
+    // console.log(localStorage.getItem("token_no"))
+    document.getElementById("showtoken").value=conntoken;
+    // console.log("error here")
 }
 
 function createGET_ALL_DBRequest(token) {
@@ -31,6 +34,25 @@ function createGET_ALL_Data(token,dbName,relName){
     + "}";
 return req;
 }
+
+
+function createREMOVERecordReques(token, dbName, relName, reqId) {
+    var req = "{\n"
+            + "\"token\" : "
+            + token
+            + ","
+            + "\"dbName\": \""
+            + dbName
+            + "\",\n" + "\"cmd\" : \"REMOVE\",\n"
+            + "\"rel\" : \""
+            + relName
+            + "\",\n" + "\"record\":"
+            + reqId
+            + "\n"
+            + "}";
+    return req;
+}
+
 
 function createGET_ALL_RELATIONRequest(token, dbName) {
     var req = "{\n"
@@ -92,9 +114,7 @@ function showDBname(array){
     .join("");
     }
 
-function fun(r,d){
-    // console.log({r,d});
-}
+
 
     function showRelName(db,relation){
         
@@ -127,6 +147,7 @@ function getDBname(){
     // // console.log(Dbreq);
         jQuery.ajaxSetup({async:false})
         var result=executeCommand(Dbreq,irlpart);
+        // console.log(document.getElementById("database"))
         document.getElementById("database").innerHTML=showDBname(result.data);
         jQuery.ajaxSetup({async:true})
         var arr=result.data; 
@@ -154,8 +175,9 @@ function getDbRelName(dbObj){
 
 
 function getTablehead(dbName,dbRel){
-    // console.log({dbName,dbRel})
-    
+    // console.log(dbRel)
+        localStorage.setItem("DB_Name",dbName);
+        localStorage.setItem("DB_Rel",dbRel);
     var headreq=createGET_ALL_Data(conntoken,dbName,dbRel);
     // console.log(headreq)
     jQuery.ajaxSetup({async:false})
@@ -163,14 +185,19 @@ function getTablehead(dbName,dbRel){
     // console.log(result)
     jQuery.ajaxSetup({async:true})
     obj=JSON.parse(result.data)['json_records']
-
-    obj[0]['record'] = {...obj[0]['record'], edit: 0}
-    obj[0]['record'] = {...obj[0]['record'], remove: 0}
-    obj[0]['record'] = {rec_no:0,...obj[0]['record']}
-    // console.log(obj[0]['record'])
+    let ind;
+    for(let index = 0; index < obj.length; index++){
+        if(obj[index]!=null){
+            ind=index;
+        }
+    }
+    obj[ind]['record'] = {...obj[ind]['record'], edit: 0}
+    obj[ind]['record'] = {...obj[ind]['record'], remove: 0}
+    obj[ind]['record'] = {rec_no:0,...obj[ind]['record']}
+    // console.log(obj[1]['record'])
   
     // obj[0]['record'].push({remove:""})
-    document.getElementById("table-head").innerHTML= showTableHead(obj[0]['record'])
+    document.getElementById("table-head").innerHTML= showTableHead(obj[ind]['record'])
     getAllData(dbName,dbRel)
 }
 let obj;
@@ -183,6 +210,21 @@ function getTableBody(obj){
            `
         ))
         .join("")
+}
+function fun(rec){
+    localStorage.setItem("rec_no",rec);
+    location.href = "./form.html";
+}
+function deleteItem(rec_no){
+    var db= localStorage.getItem("DB_Name");
+    var rel= localStorage.getItem("DB_Rel");
+    var removeReqStr = createREMOVERecordReques(conntoken,db,rel, rec_no);
+    console.log(removeReqStr);
+    jQuery.ajaxSetup({async:false})
+    var result=executeCommand(removeReqStr,imlpart);
+    jQuery.ajaxSetup({async:true});
+    window.location.reload();
+
 }
 
 function getAllData(db,rel){
@@ -200,32 +242,36 @@ function getAllData(db,rel){
         document.getElementById("table-body").innerHTML = ""
         for (let index = 0; index < obj.length; index++) {
             // console.log(JSON.parse(result.data)['json_records'][index]['rec_no'])
+            console.log(obj[index]['rec_no']);
             // console.log(obj[index]['record'])
-            
-            document.getElementById("table-body").innerHTML += 
-            `
+            if(obj[index]['record']!=null){
 
-                 <tr>
-                 <td>${obj[index]['rec_no']}</td>
-                ${getTableBody(obj[index]['record'])}
-                <td><i class="fa-solid fa-pen-to-square"></i></td>
-            <td><i class="fa-solid fa-trash"></i></td> 
-                </tr>
-            `
+                document.getElementById("table-body").innerHTML += 
+                `
+    
+                     <tr>
+                     <td>${obj[index]['rec_no']}</td>
+                    ${getTableBody(obj[index]['record'])}
+                    <td ><i onclick="fun(${obj[index]['rec_no']})" class="fa-solid fa-pen-to-square"></i></td>
+                <td><i onclick="deleteItem('${obj[index]['rec_no']}')" class="fa-solid fa-trash"></i></td> 
+                    </tr>
+                `
+            }
             // console.log(obj[index]['record']['da'])
             // <td><i class="fa-solid fa-pen-to-square"></i></td>
             // <td><i class="fa-solid fa-trash"></i></td> 
             
         }
-
-
 }
 
 
 
-
-getURL();
-getDBname();
+ getURL();
+  getDBname();
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    
+})
 // getDbRelName();
 // getTablehead();
 // getAllData();
