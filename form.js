@@ -220,6 +220,8 @@ function getLast(){
     $('#next').prop('disabled',true);
     $('#save').prop('disabled',true);
 }
+function goToHome(){
+    location.href = "./dashboard.html";}
 
 function getNext(){
     var r=getCurrRecNoFromLS();
